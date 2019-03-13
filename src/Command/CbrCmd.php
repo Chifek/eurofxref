@@ -79,8 +79,6 @@ class CbrCmd extends Command
             $em->persist($cbr);
             $em->flush();
         }
-
-        var_dump($data);
-        die;
+        $output->writeln('Success! The data recorded into BD. You can get all data via REST API with route "/cbr" method: GET');
     }
 }
