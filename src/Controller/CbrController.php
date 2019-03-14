@@ -15,25 +15,29 @@ class CbrController extends AbstractController
      */
     public function index()
     {
-        $em = $this->container->get('doctrine')->getManager();
-        $moneyRepository = $em->getRepository(Cbr::class);
-        $cbrMoney = $moneyRepository->findAll();
+        try {
+            $em = $this->container->get('doctrine')->getManager();
+            $moneyRepository = $em->getRepository(Cbr::class);
+            $cbrMoney = $moneyRepository->findAll();
 
-        $arrayCollection = array();
+            $arrayCollection = array();
 
-        foreach ($cbrMoney as $money) {
-            $arrayCollection[] = array(
-                'id' => $money->getId(),
-                'numCode' => $money->getNumcode(),
-                'charCode' => $money->getCharcode(),
-                'nominal' => $money->getNominal(),
-                'name' => $money->getName(),
-                'value' => $money->getValue(),
-                'date' => $money->getDate(),
-            );
+            foreach ($cbrMoney as $money) {
+                $arrayCollection[] = array(
+                    'id' => $money->getId(),
+                    'numCode' => $money->getNumcode(),
+                    'charCode' => $money->getCharcode(),
+                    'nominal' => $money->getNominal(),
+                    'name' => $money->getName(),
+                    'value' => $money->getValue(),
+                    'date' => $money->getDate(),
+                );
+            }
+
+            return new JsonResponse($arrayCollection);
+        } catch (\Exception $e) {
+            return new JsonResponse($e->getMessage());
         }
-
-        return new JsonResponse($arrayCollection);
     }
 
     /**
@@ -41,33 +45,37 @@ class CbrController extends AbstractController
      */
     public function exchange(Request $request)
     {
-        $em = $this->container->get('doctrine')->getManager();
-        $moneyRepository = $em->getRepository(Cbr::class);
+        try {
+            $em = $this->container->get('doctrine')->getManager();
+            $moneyRepository = $em->getRepository(Cbr::class);
 
-        $data = json_decode($request->getContent(), true);
-        $from = strtoupper($data['from']);
-        $fromNominal = (integer)$data['from_nominal'];
-        $to = strtoupper($data['to']);
+            $data = json_decode($request->getContent(), true);
+            $from = strtoupper($data['from']);
+            $fromNominal = (integer)$data['from_nominal'];
+            $to = strtoupper($data['to']);
 
-        $moneyFrom = $moneyRepository->findOneBy(['charcode' => $from]);
-        if (!$moneyFrom) {
-            throw $this->createNotFoundException(
-                'No currency found for charCode ' . $from
-            );
+            $moneyFrom = $moneyRepository->findOneBy(['charcode' => $from]);
+            if (!$moneyFrom) {
+                throw $this->createNotFoundException(
+                    'No currency found for charCode ' . $from
+                );
+            }
+
+            $moneyTo = $moneyRepository->findOneBy(['charcode' => $to]);
+            if (!$moneyTo) {
+                throw $this->createNotFoundException(
+                    'No currency found for ' . $to
+                );
+            }
+
+            $firstCurrency = (integer)$moneyFrom->getValue() / (integer)$moneyFrom->getNominal();
+            $secondCurrency = (integer)$moneyTo->getValue() / (integer)$moneyTo->getNominal();
+
+            $total = $fromNominal * $firstCurrency / $secondCurrency;
+            $result = $fromNominal . ' ' . $moneyFrom->getName() . ' будет равен в ' . $total . ' ' . $moneyTo->getName();
+            return new JsonResponse($result);
+        } catch (\Exception $e) {
+            return new JsonResponse($e->getMessage());
         }
-
-        $moneyTo = $moneyRepository->findOneBy(['charcode' => $to]);
-        if (!$moneyTo) {
-            throw $this->createNotFoundException(
-                'No currency found for ' . $to
-            );
-        }
-
-        $firstCurrency = (integer)$moneyFrom->getValue() / (integer)$moneyFrom->getNominal();
-        $secondCurrency = (integer)$moneyTo->getValue() / (integer)$moneyTo->getNominal();
-
-        $total = $fromNominal * $firstCurrency / $secondCurrency;
-        $result = $fromNominal . ' ' . $moneyFrom->getName() . ' будет равен в ' . $total . ' ' . $moneyTo->getName();
-        return new JsonResponse($result);
     }
 }
