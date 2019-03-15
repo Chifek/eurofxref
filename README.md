@@ -64,18 +64,10 @@ php bin/console app:get-info-eurofx
 
 ### Юнит тесты
 
-Explain what these tests test and why
+Для запуска Unit тестов запустите команду:
 
 ```
-Give an example
-```
-
-### Интеграционные тесты
-
-Explain what these tests test and why
-
-```
-Give an example
+phpunit
 ```
 
 ## Автор
