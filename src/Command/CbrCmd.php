@@ -58,27 +58,31 @@ class CbrCmd extends Command
             }
             $em->flush();
         }
+        if (!empty($nodeValues['NumCode'])) {
+            for ($i = 0; $i < count($nodeValues['Value']); $i++) {
+                $data[$i]['NumCode'] = $nodeValues['NumCode'][$i];
+                $data[$i]['CharCode'] = $nodeValues['CharCode'][$i];
+                $data[$i]['Nominal'] = $nodeValues['Nominal'][$i];
+                $data[$i]['Name'] = $nodeValues['Name'][$i];
+                $data[$i]['Value'] = $nodeValues['Value'][$i];
 
-        for ($i = 0; $i < count($nodeValues['Value']); $i++) {
-            $data[$i]['NumCode'] = $nodeValues['NumCode'][$i];
-            $data[$i]['CharCode'] = $nodeValues['CharCode'][$i];
-            $data[$i]['Nominal'] = $nodeValues['Nominal'][$i];
-            $data[$i]['Name'] = $nodeValues['Name'][$i];
-            $data[$i]['Value'] = $nodeValues['Value'][$i];
+                $em = $this->container->get('doctrine')->getManager();
 
-            $em = $this->container->get('doctrine')->getManager();
+                $cbr = new Cbr();
+                $cbr->setNumcode($nodeValues['NumCode'][$i]);
+                $cbr->setCharCode($nodeValues['CharCode'][$i]);
+                $cbr->setNominal($nodeValues['Nominal'][$i]);
+                $cbr->setName($nodeValues['Name'][$i]);
+                $cbr->setValue((floatval($nodeValues['Value'][$i])));
+                $cbr->setDate(new \DateTime());
 
-            $cbr = new Cbr();
-            $cbr->setNumcode($nodeValues['NumCode'][$i]);
-            $cbr->setCharCode($nodeValues['CharCode'][$i]);
-            $cbr->setNominal($nodeValues['Nominal'][$i]);
-            $cbr->setName($nodeValues['Name'][$i]);
-            $cbr->setValue((floatval($nodeValues['Value'][$i])));
-            $cbr->setDate(new \DateTime());
-
-            $em->persist($cbr);
-            $em->flush();
+                $em->persist($cbr);
+                $em->flush();
+            }
+        } else {
+            $output->writeln('Something went wrong, https://www.cbr.ru/ is have not values!');
         }
+
         if (count($nodeValues['Value']) > 0) {
             $output->writeln('Success! The data recorded into BD. You can get all data via REST API with route "/cbr" method: GET');
         } else {

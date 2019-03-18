@@ -32,7 +32,7 @@ class GetEurofxrefDaily extends Command
             }
             $em->flush();
         }
-        if (!empty($XML->Cube->Cube->Cube)) {
+        if (!empty($XML->Cube->Cube->Cube['currency'])) {
             foreach ($XML->Cube->Cube->Cube as $rate) {
                 $em = $this->container->get('doctrine')->getManager();
 
@@ -43,12 +43,14 @@ class GetEurofxrefDaily extends Command
                 $em->persist($euroFx);
                 $em->flush();
             }
+        } else {
+            $output->writeln('Something went wrong, http://www.ecb.europa.eu/ is have not values!');
         }
 
         if (!empty($XML->Cube->Cube->Cube['currency'])) {
             $output->writeln('Success! The data recorded into BD. You can get all data via REST API with route "/eurofx" method: GET');
         } else {
-            $output->writeln('Something went wrong, https://www.cbr.ru/ is have not values!');
+            $output->writeln('Something went wrong, http://www.ecb.europa.eu/ is have not values!');
         }
     }
 }
