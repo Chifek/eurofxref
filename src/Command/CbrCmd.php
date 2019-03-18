@@ -79,6 +79,10 @@ class CbrCmd extends Command
             $em->persist($cbr);
             $em->flush();
         }
-        $output->writeln('Success! The data recorded into BD. You can get all data via REST API with route "/cbr" method: GET');
+        if (count($nodeValues['Value']) > 0) {
+            $output->writeln('Success! The data recorded into BD. You can get all data via REST API with route "/cbr" method: GET');
+        } else {
+            $output->writeln('Something went wrong, https://www.cbr.ru/ is have not values!');
+        }
     }
 }
