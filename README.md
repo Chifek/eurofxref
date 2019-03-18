@@ -69,6 +69,21 @@ php bin/console app:get-info-eurofx
 phpunit
 ```
 
+## Настройка cron
+
+Чтобы настроить автоматическое выполнение комманд впишите след.значения в crontab
+
+### Юнит тесты
+
+Для запуска Unit тестов запустите команду:
+
+```
+crontab -e
+
+0 */12 * * * /path/to/php7.0 /path/to/project/root/bin/console app:get-info-cbr
+0 */12 * * * /path/to/php7.0 /path/to/project/root/bin/console app:get-info-eurofx
+```
+
 ## Автор
 
  **Исмаилов Руслан** - *web developer* - [Chifek](https://github.com/Chifek)
