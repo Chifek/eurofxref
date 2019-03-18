@@ -2,8 +2,7 @@
 
 namespace App\Tests;
 
-use App\Entity\Cbr;
-use App\Controller\CbrController;
+use App\Entity\Eurofx;
 use PHPUnit\Framework\TestCase;
 
 
@@ -16,17 +15,11 @@ class EurofxTest extends TestCase
      */
     public function testSetGetEntity()
     {
-        $var = new Cbr();
+        $var = new Eurofx();
         $var->setCharcode('CharCode');
-        $var->setNumcode('Test');
-        $var->setNominal(3);
-        $var->setName('Test');
-        $var->setValue(0.13);
+        $var->setRate(0.13);
 
         $this->assertEquals($var->getCharcode(), 'CharCode');
-        $this->assertEquals($var->getNumcode(), 'Test');
-        $this->assertEquals($var->getNominal(), 3);
-        $this->assertEquals($var->getName(), 'Test');
-        $this->assertEquals($var->getValue(), 0.13);
+        $this->assertEquals($var->getRate(), 0.13);
     }
 }
