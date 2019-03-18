@@ -32,17 +32,23 @@ class GetEurofxrefDaily extends Command
             }
             $em->flush();
         }
+        if (!empty($XML->Cube->Cube->Cube)) {
+            foreach ($XML->Cube->Cube->Cube as $rate) {
+                $em = $this->container->get('doctrine')->getManager();
 
-        foreach ($XML->Cube->Cube->Cube as $rate) {
-            $em = $this->container->get('doctrine')->getManager();
+                $euroFx = new Eurofx();
+                $euroFx->setCharCode($rate["currency"]);
+                $euroFx->setRate((floatval($rate["rate"])));
 
-            $euroFx = new Eurofx();
-            $euroFx->setCharCode($rate["currency"]);
-            $euroFx->setRate((floatval($rate["rate"])));
-
-            $em->persist($euroFx);
-            $em->flush();
+                $em->persist($euroFx);
+                $em->flush();
+            }
         }
-        $output->writeln('Success! The data recorded into BD. You can get all data via REST API with route "/eurofx" method: GET');
+
+        if (!empty($XML->Cube->Cube->Cube['currency'])) {
+            $output->writeln('Success! The data recorded into BD. You can get all data via REST API with route "/eurofx" method: GET');
+        } else {
+            $output->writeln('Something went wrong, https://www.cbr.ru/ is have not values!');
+        }
     }
 }
